@@ -4,6 +4,7 @@
 cd MyLeanLib
 lake build MyLeanLib:static
 cd ../my_rust_lib
+source set_env_vars.sh
 cargo run
 ```
 
