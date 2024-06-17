@@ -2,6 +2,7 @@ use lean_sys::{
     lean_dec, lean_dec_ref, lean_initialize_runtime_module_locked,
     lean_io_mark_end_initialization, lean_io_mk_world, lean_io_result_is_ok,
     lean_io_result_show_error, lean_mk_string, lean_object, lean_string_cstr,
+    lean_initialize_thread, lean_finalize_thread,
 };
 use std::ffi::{CStr, CString};
 use std::{sync::Once, thread};
@@ -34,6 +35,12 @@ fn init(i: u8) {
             lean_io_mark_end_initialization();
         };
     });
+    unsafe {lean_initialize_thread()};
+}
+
+fn finalize(i: u8) {
+    println!("Finalize {i}");
+    unsafe {lean_finalize_thread()};
 }
 
 fn lean_obj_p_to_rust_string(lean_str_obj: *mut lean_object) -> String {
@@ -62,19 +69,17 @@ fn foo(i: u8) {
     
     println!("Response: {response_rust_string}");
     println!("Good bye {i}");
+    finalize(i);
 }
 
 fn main() {
     let h1 = thread::spawn(|| {
         foo(1);
     });
-
-    // Multiple threads won't work until https://github.com/leanprover/lean4/pull/3632 is released
-
-    // let h2 = thread::spawn(|| {
-    //     foo(2);
-    // });
+    let h2 = thread::spawn(|| {
+        foo(2);
+    });
 
     h1.join().unwrap();
-    // h2.join().unwrap();
+    h2.join().unwrap();
 }
