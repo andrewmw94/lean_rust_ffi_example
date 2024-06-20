@@ -8,7 +8,5 @@ source set_env_vars.sh
 cargo run
 ```
 
-
 ## Caveats
-Multiple threads won't work prior to Lean 4.8.0. This affects `cargo test`.
-To use Lean 4.8.0, you can use https://github.com/andrewmw94/lean-sys/tree/main until this gets merged upstream.
+You need `lean --print-libdir` to point to Lean 4.8.0 to run multiple threads. Just setting `MyLeanLib/lean-toolchain` to Lean 4.8.0 is not sufficient.
